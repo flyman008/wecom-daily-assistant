@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "categories": ["重点企业完成进度", "培训与活动", "企业服务与对接", "综合事务", "其他工作"],
+  "categoryCardRows": [1, 2, 2],
+  "detailTabs": ["已完成", "未完成", "计划外"],
+  "defaultDetailTab": "已完成",
+  "comparison": "完成数差值与完成率百分点差值（PP）",
+  "employeeNameAction": "打开完整员工周报，可返回原列表",
+  "itemTextAction": "打开对应事项详情，详情内可反馈",
+  "feedbackContent": "保留老板原文，只归集，不改写",
+  "unknownProgress": "未知不记作0",
+  "sensitiveData": "公开模板只放示例，不含客户身份与企业档案"
+}

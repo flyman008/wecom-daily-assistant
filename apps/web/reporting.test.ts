@@ -169,10 +169,10 @@ describe('进度、事实草稿与快照隔离', () => {
     const mixed=progress(100);mixed.items.push({...progress(20).items[0],workItemId:'second',metric:{...mixed.items[0].metric,unit:'次'}});
     page.assign('rows',[{userId:'a',name:'甲',progress:progress(100)},{userId:'b',name:'乙',progress:progress(80)},{userId:'c',name:'丙',progress:mixed},{userId:'d',name:'丁',progress:progress(null)}]);
     const root=page.run<Element>(`rpManagerReport(rows,'${week}')`),cards=byTag(root,'label').map(text);
-    for(const name of ['全部完成','各项达到80%','仍有事项低于80%','进度待确认']) expect(cards.find(c=>c.includes(name))).toContain('1/4');
-    expect(cards.filter(c=>c.includes('企业走访'))).toHaveLength(2);
-    expect(cards.filter(c=>c.includes('企业走访')).some(c=>c.includes('1/5'))).toBe(true);
-    expect(cards.filter(c=>c.includes('企业走访')).join(' ')).not.toMatch(/家|次/);
+    for(const name of ['全部完成','各项达到80%','仍有事项低于80%','进度待确认']) expect(cards.find(c=>c.trim().startsWith(name))).toContain('1/4');
+    expect(cards.filter(c=>c.includes('重点企业完成进度'))).toHaveLength(1);
+    expect(cards.filter(c=>c.includes('重点企业完成进度')).some(c=>c.includes('—/5'))).toBe(true);
+    expect(cards.filter(c=>c.includes('重点企业完成进度')).join(' ')).not.toMatch(/家|次/);
   });
   it('只显示有内容的进展，不铺空白日期，保留已确认零值与最新累计值', () => {
     const page = setup(), data = progress(0); data.items[0].days[0].progressValue = null; data.items[0].days[0].completedCount = null;
@@ -197,10 +197,10 @@ describe('进度、事实草稿与快照隔离', () => {
       {userId:'restricted',name:'受限员工',restricted:true,progress:progress(100),reasons:[{content:'不可见原因'}]},
     ]);
     const root=page.run<Element>(`rpManagerReport(teamRows,'${week}')`);
-    expect(text(root)).toContain('0/5 ·0%');expect(text(root)).toContain('等待企业补材料');expect(text(root)).not.toContain('不可见原因');
+    expect(text(root)).toContain('—/5 进度待确认');expect(text(root)).toContain('等待企业补材料');expect(text(root)).not.toContain('不可见原因');
     const cards=byTag(root,'label').map(text);
     expect(cards.find(value=>value.includes('全部完成'))).toContain('0/2');
-    expect(cards.find(value=>value.includes('进度待确认'))).toContain('2/2');
+    expect(cards.find(value=>value.trim().startsWith('进度待确认'))).toContain('2/2');
   });
 
   it('老板业务统计由事项进度决定，不受周报是否生成影响，也不合并同名负责人事项',()=>{
@@ -208,9 +208,9 @@ describe('进度、事实草稿与快照隔离', () => {
     const rows=[{userId:'a',name:'甲',weekId:week,progress:progress(100),report:null},{userId:'b',name:'乙',weekId:week,progress:progress(20),report:report()}];
     page.assign('businessRows',rows);const first=page.run<Element>(`rpManagerReport(businessRows,'${week}')`);
     expect(all(first).filter(node=>node.className==='rp-business-item')).toHaveLength(2);
-    expect(byTag(first,'label').map(text).find(value=>value.includes('企业走访'))).toContain('6/10 ·60%');
+    expect(byTag(first,'label').map(text).find(value=>value.includes('重点企业完成进度'))).toContain('6/10 ·60%');
     expect(byTag(first,'label').map(text).find(value=>value.includes('全部完成'))).toContain('1/2 ·50%');
-    const taskCard=byTag(first,'label').map(text).find(value=>value.includes('企业走访'))!;
+    const taskCard=byTag(first,'label').map(text).find(value=>value.includes('重点企业完成进度'))!;
     expect(taskCard).not.toContain('员工2');
     expect(taskCard).toContain('周环比 数/PP');
     expect(text(first).match(/企业走访 · 员工/g)).toBeNull();

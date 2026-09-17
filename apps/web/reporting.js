@@ -59,13 +59,14 @@ function rpTimeline(progress,asOfDate=crmDate(),snapshot=null,editReason=null) {
     const last=item.days.filter(d=>d.date<=asOfDate).at(-1);
     const itemName=snapshot?.items?.find(row=>row.id===item.workItemId)?.name||item.name;
     const identity=el('div','rp-item-identity');
-    identity.append(el('strong','',`${itemName}${item.retired?'（已移除，保留历史）':''}`));
+    identity.append(el('strong','',`${rpTaskName(itemName)}${item.retired?'（已移除，保留历史）':''}`));
     if(item.metric?.mode==='count') {const target=el('small','rp-target',`${last?.completedCount==null?'—':last.completedCount}/${item.metric.total}${item.metric.unit}`);target.title=`完成${last?.completedCount==null?'待明确':last.completedCount}，计划${item.metric.total}${item.metric.unit}`;identity.append(target);}
     heading.append(identity,rpMeter(last?.progressValue));
     const keyInfo=snapshot?.reasons?.find(reason=>reason.workItemId===item.workItemId)?.content||item.days.filter(day=>day.date<=asOfDate&&day.progressText?.trim()&&!/^(?:暂无|无|没有)新?进展[。\s]*$/.test(day.progressText.trim())).at(-1)?.progressText;
     if(keyInfo) heading.append(el('span','rp-item-key',keyInfo));
     detail.append(heading);
     const metric=item.metric,body=el('div','rp-item-body');
+    if(rpTaskName(itemName)!==itemName)body.append(el('p','rp-background',itemName));
     let background=item.planBackground||snapshot?.items?.find(row=>row.id===item.workItemId)?.plan_background;
     const repeatedPlan=metric?.mode==='count'?`${itemName}${metric.total}${metric.unit}`:'';
     if(background&&repeatedPlan&&background.startsWith(repeatedPlan)&&/^[。；;\s]*$/.test(background.slice(repeatedPlan.length, repeatedPlan.length+1))) background=background.slice(repeatedPlan.length).replace(/^[。；;\s]+/,'');
@@ -97,7 +98,7 @@ function rpSelector(options,kind) {
   options.forEach((option,index)=>{
     const input=el('input','rp-select-input');input.type='radio';input.name=name;input.id=name+'-'+index;
     input.setAttribute('aria-label',option.label);if(index===0){input.checked=true;input.setAttribute('checked','');}
-    const label=el('label',`rp-select-card${option.compact?' rp-select-compact':''}`);label.setAttribute('for',input.id);
+    const label=el('label',`rp-select-card${option.compact?' rp-select-compact':''}${kind==='rp-task-selector'&&index===0?' five-category-primary':''}`);label.setAttribute('for',input.id);
     if(option.compact){const heading=el('span','rp-card-heading');heading.append(el('span','',option.label));if(option.headingMeta)heading.append(el('small','rp-heading-meta',option.headingMeta));else if(option.deltaValue)heading.append(el('small','rp-compare-label','周环比 数/PP'));label.append(heading);}
     else label.append(el('span','',option.label));
     if(option.compact){const metrics=el('span','rp-card-metrics');if(option.value!=null)metrics.append(el('strong','',option.value));if(option.rate)metrics.append(el('small','rp-current-rate',option.rate));if(option.note)metrics.append(el('small','muted',option.note));if(option.deltaValue){const comparison=el('span','rp-card-comparison');comparison.title=option.deltaTitle||'';comparison.append(el('small','rp-compare',option.deltaValue));if(option.deltaRate)comparison.append(el('small','rp-compare',option.deltaRate));metrics.append(comparison);}else if(option.delta)metrics.append(el('small','rp-compare',option.delta));label.append(metrics);}
@@ -131,7 +132,11 @@ function rpBusinessEntry(entry,week) {
   if(reason)detail.append(el('p','rp-business-next',`待跟进 · ${reason}`));
   block.append(detail);return block;
 }
-function rpTaskName(name) {const base=name.split(/[，,｜|]/)[0].trim();return ({'走访企业':'企业走访','合同梳理':'梳理合同','活动开展':'开展活动'})[base]||base;}
+const RP_CATEGORIES=['重点企业完成进度','培训与活动','企业服务与对接','综合事务','其他工作'];
+function rpTaskName(name) {
+  const base=name.split(/[，,｜|]/)[0].trim();
+  return ({'企业走访':RP_CATEGORIES[0],'走访企业':RP_CATEGORIES[0],'开展活动':RP_CATEGORIES[1],'活动开展':RP_CATEGORIES[1],'业务学习':RP_CATEGORIES[1],'梳理合同':RP_CATEGORIES[2],'合同梳理':RP_CATEGORIES[2],'企业服务':RP_CATEGORIES[2]})[base]||(RP_CATEGORIES.includes(base)?base:RP_CATEGORIES[4]);
+}
 function rpDelta(current,previous,unit) {
   if(previous==null)return '周环比—';
   const delta=current-previous;
@@ -152,23 +157,24 @@ function rpPersonOverview(row) {
 function rpManagerReport(rows,week) {
   const root=el('section','rp-manager-report'),staff=rows.filter(row=>row.userId!==WS_SESSION?.userId);
   const entries=staff.filter(row=>!row.restricted).flatMap(row=>(row.progress?.items||[]).filter(item=>!item.retired).map(item=>({row,item,last:rpLast(item)})));
-  // Only explicit equivalent names are normalized; unrelated tasks and different units are never added together.
-  const groups=new Map();
+  // Five approved categories. Mixed units use completed task counts, never add houses to events.
+  const groups=new Map(RP_CATEGORIES.map(title=>[title,{title,metric:null,entries:[]}]));
   for(const entry of entries) {
-    const title=rpTaskName(entry.item.name),metric=entry.item.metric;
-    const key=JSON.stringify([title,metric?.mode,metric?.unit]);
-    if(!groups.has(key))groups.set(key,{title,metric,entries:[]});groups.get(key).entries.push(entry);
+    groups.get(rpTaskName(entry.item.name)).entries.push(entry);
   }
-  const order=['企业走访','梳理合同','开展活动','业务学习'];
-  const taskOptions=[...groups.values()].sort((a,b)=>(order.includes(a.title)?order.indexOf(a.title):99)-(order.includes(b.title)?order.indexOf(b.title):99)).map(group=>{
+  const taskOptions=[...groups.values()].map(group=>{
     const body=el('div','rp-business-list');
+    if(!group.entries.length){body.append(el('p','muted','暂无可查看的工作事项。'));return {label:group.title,value:'暂无计划',compact:true,body};}
+    const firstMetric=group.entries[0].item.metric;
+    group.metric=firstMetric?.mode==='count'&&group.entries.every(e=>e.item.metric?.mode==='count'&&e.item.metric?.unit===firstMetric.unit)?firstMetric:null;
     group.entries.forEach(entry=>body.append(rpBusinessEntry(entry,week)));
     const count=group.metric?.mode==='count',total=count?group.entries.reduce((n,e)=>n+e.item.metric.total,0):group.entries.length;
     const unknown=group.entries.filter(e=>count?e.last?.completedCount==null:e.last?.progressValue==null).length;
     const done=group.entries.reduce((n,e)=>n+(count?(e.last?.completedCount??0):(e.last?.progressValue>=100?1:0)),0);
     const previous=[...new Map(group.entries.map(entry=>[entry.row.userId,entry.row])).values()].map(row=>{
       if(!row.previousProgress||!row.previousAsOf)return null;
-      const items=row.previousProgress.items.filter(item=>!item.retired&&rpTaskName(item.name)===group.title&&item.metric?.mode===group.metric?.mode&&item.metric?.unit===group.metric?.unit);
+      const items=row.previousProgress.items.filter(item=>!item.retired&&rpTaskName(item.name)===group.title);
+      if(count&&items.some(item=>item.metric?.mode!=='count'||item.metric?.unit!==group.metric.unit))return null;
       if(!items.length)return null;
       const points=items.map(item=>rpLast(item,row.previousAsOf));
       if(points.some(point=>count?point?.completedCount==null:point?.progressValue==null))return null;
@@ -181,7 +187,7 @@ function rpManagerReport(rows,week) {
     });
     const paired=previous.filter(value=>value!==null),comparison=paired.length?paired.reduce((n,value)=>n+value.previous,0):null;
     const delta=rpComparison(paired.reduce((n,value)=>n+value.current,0),paired.reduce((n,value)=>n+value.currentTotal,0),comparison,paired.length?paired.reduce((n,value)=>n+value.previousTotal,0):null);
-    return {label:group.title,value:`${done}/${total}`,rate:`·${rpRate(done,total)}%`,deltaValue:delta.absolute,deltaRate:delta.rate,deltaTitle:delta.title,compact:true,body};
+    return {label:group.title,value:unknown?`—/${total}`:`${done}/${total}`,rate:unknown?'进度待确认':`·${rpRate(done,total)}%`,deltaValue:delta.absolute,deltaRate:delta.rate,deltaTitle:(count?'同单位完成数 / 计划数':'完成事项数 / 计划事项数')+'；'+(delta.title||'周环比暂无可比数据'),compact:true,body};
   });
   const taskBody=taskOptions.length?rpSelector(taskOptions,'rp-task-selector'):el('p','notice','暂无可查看的工作事项。');
   const bucket=(row,previous=false)=>{

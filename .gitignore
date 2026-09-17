@@ -19,3 +19,5 @@ coverage/
 config/*.json
 !config/*.example.json
 .DS_Store
+# One-time importer may refer to private source identities; approved outputs only.
+scripts/import-confirmed-templates.cjs

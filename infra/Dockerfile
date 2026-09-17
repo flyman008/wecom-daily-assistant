@@ -5,6 +5,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json vitest.config
 COPY apps ./apps
 COPY packages ./packages
 COPY scripts ./scripts
+COPY templates ./templates
 RUN pnpm install --frozen-lockfile && mkdir -p .runtime/data .runtime/attachments .runtime/backups .runtime/wecom-cli && chown -R node:node /app
 ENV TZ=Asia/Shanghai
 USER node
