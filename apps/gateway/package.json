@@ -1,0 +1,12 @@
+{
+  "name": "@wecom/gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@wecom/aibot-node-sdk": "1.0.6",
+    "@wecom/agent": "workspace:*",
+    "@wecom/domain": "workspace:*",
+    "@wecom/persistence": "workspace:*"
+  }
+}

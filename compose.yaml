@@ -1,0 +1,35 @@
+name: wecom-daily-assistant
+x-app: &app
+  image: wecom-daily-assistant:local
+  build:
+    context: .
+    dockerfile: infra/Dockerfile
+  restart: unless-stopped
+  environment:
+    TZ: Asia/Shanghai
+  volumes:
+    - ./.runtime:/app/.runtime
+services:
+  api:
+    <<: *app
+    command: [pnpm, api]
+    ports:
+      - '127.0.0.1:3000:3000'
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/api/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+  gateway:
+    <<: *app
+    command: [pnpm, gateway]
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:8788').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s

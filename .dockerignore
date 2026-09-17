@@ -1,0 +1,12 @@
+.git
+**/node_modules
+.runtime
+.tmp
+logs
+reports
+.env
+**/*.env
+**/*.pem
+**/*.key
+**/*.sqlite*
+coverage

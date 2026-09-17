@@ -1,0 +1,9 @@
+{
+  "name": "@wecom/agent-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@wecom/agent": "workspace:*"
+  }
+}

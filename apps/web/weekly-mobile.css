@@ -1,0 +1,72 @@
+/* The report is a phone-sized document even when opened on a desktop. No admin shell. */
+body.mobile-weekly { margin:0; display:block; min-width:0; background:#f5f7fa; }
+.mobile-weekly-content { width:100%; max-width:520px; min-height:100dvh; margin:0 auto; padding:10px 10px 24px; box-sizing:border-box; overflow-wrap:anywhere; }
+.mw-heading { margin:0 0 8px; }
+.mw-brand { margin:0 0 4px; font-size:12px; color:#8a9099; }
+.mw-title-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.mw-heading h1 { font-size:21px; line-height:30px; margin:0; font-weight:600; white-space:nowrap; }
+.mw-week-trigger { flex:none; min-height:30px; border:0; background:transparent; color:#407969; padding:2px 0; font-size:13px; }
+.mw-back { display:inline-flex; align-items:center; min-height:28px; color:#407969; text-decoration:none; margin:0 0 2px; }
+.mobile-weekly .mw-week-dialog { padding:0; }
+.mw-week-dialog section { padding:16px; }
+.mw-week-list { display:grid; gap:6px; }
+.mw-week-option { width:100%; min-height:42px; padding:8px 12px; text-align:left; border:1px solid #e9ecf0; border-radius:6px; background:#fff; color:#1e2226; }
+.mw-week-option.active { color:#407969; border-color:#407969; background:#eef5f4; }
+.mobile-weekly .mw-demo-note { font-size:12px; line-height:18px; padding:8px 10px; margin:8px 0 12px; background:#eef5f4; border:0; }
+.mobile-weekly .rp-selector { gap:6px; }
+.mobile-weekly .rp-selector>.rp-select-card { flex-basis:calc(50% - 6px); padding:8px 9px; }
+.mobile-weekly .rp-view-selector>.rp-select-card { flex-basis:40%; padding:8px; }
+.mobile-weekly .rp-selector .rp-select-card strong { font-size:18px; line-height:24px; }
+.mobile-weekly .rp-select-compact { gap:2px; }
+.mobile-weekly .rp-card-heading { display:flex; align-items:center; justify-content:space-between; gap:4px; }
+.mobile-weekly .rp-compare-label { color:#407969; font-size:9px; line-height:16px; white-space:nowrap; }
+.mobile-weekly .rp-heading-meta { color:#697078; font-size:10px; line-height:16px; font-weight:400; white-space:nowrap; }
+.mobile-weekly .rp-card-metrics { display:flex; align-items:baseline; gap:5px; white-space:nowrap; min-width:0; }
+.mobile-weekly .rp-card-metrics small { font-size:11px; line-height:16px; }
+.mobile-weekly .rp-card-comparison { display:flex; align-items:baseline; gap:3px; margin-left:auto; white-space:nowrap; }
+@media(max-width:360px) {
+  .mobile-weekly .rp-selector .rp-select-card { padding-left:6px; padding-right:6px; }
+  .mobile-weekly .rp-card-metrics { gap:2px; }
+  .mobile-weekly .rp-card-metrics small { font-size:8.5px; letter-spacing:-.3px; }
+  .mobile-weekly .rp-compare-label { font-size:8px; letter-spacing:-.4px; }
+  .mobile-weekly .rp-heading-meta { font-size:8px; letter-spacing:-.4px; }
+  .mobile-weekly .rp-card-comparison { gap:1px; }
+  .mobile-weekly .rp-selector .rp-select-card strong { font-size:15px; letter-spacing:-.4px; }
+}
+.mobile-weekly .rp-manager-report .rp-business-list,.mobile-weekly .rp-manager-report .rp-people-list { padding:8px 10px; }
+.mobile-weekly .rp-manager-report .rp-business-item,.mobile-weekly .rp-manager-report .rp-people-list>.rp-person { grid-template-columns:minmax(0,1fr) max-content; gap:4px 8px; padding:10px 0; }
+.mobile-weekly .rp-manager-report .rp-business-item>.rp-business-copy { grid-column:1/-1; grid-row:1; min-width:0; }
+.mobile-weekly .rp-manager-report .rp-people-list>.rp-person>.rp-business-copy { grid-column:1/-1; grid-row:1; }
+.mobile-weekly .rp-manager-report .rp-team-actions { grid-column:2; grid-row:1; }
+.mobile-weekly .rp-manager-report .rp-team-actions .quiet-button { min-height:36px; }
+.mobile-weekly .rp-employee-name { display:inline-flex; align-items:center; min-height:36px; }
+.mobile-weekly .rp-manager-report .rp-business-item .rp-employee-name { min-height:0; padding:0; font-size:14px; line-height:22px; white-space:nowrap; }
+.mobile-weekly .rp-manager-report .rp-business-name { display:inline; margin-right:2px; font-weight:600; }
+.mobile-weekly .rp-manager-report .rp-person-name { display:inline; min-height:0; margin-right:2px; padding:0; font-size:14px; line-height:22px; }
+.mobile-weekly .rp-feedback-top { padding:12px; }
+.mobile-weekly .rp-feedback-top .ws-feedback { overflow-wrap:anywhere; }
+.mobile-weekly .rp-week-summary { font-size:14px; line-height:21px; padding:8px 10px; margin:8px 0; }
+.mobile-weekly .rp-mobile-report .rp-item { margin:6px 0; }
+.mobile-weekly .rp-item-heading { padding:8px 10px; gap:4px 8px; }
+.mobile-weekly .rp-item-identity { display:flex; align-items:baseline; gap:8px; white-space:nowrap; }
+.mobile-weekly .rp-item-identity strong { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mobile-weekly .rp-item-identity .rp-target { flex:none; display:inline; margin:0; font-size:12px; }
+.mobile-weekly .rp-mobile-report .rp-meter { min-width:34px; text-align:right; }
+.mobile-weekly .rp-mobile-report .rp-meter progress { display:none; }
+.mobile-weekly .rp-item-key { line-height:20px; }
+.mobile-weekly .rp-item-body { padding:0 10px 12px; }
+.mobile-weekly .rp-team-note { margin-bottom:0; }
+.mobile-weekly .rp-group-title { margin:0 0 4px; font-size:14px; line-height:22px; }
+.mobile-weekly .mw-feedback-entry { display:block; border:0; background:transparent; color:#407969; padding:4px 0; min-height:36px; text-align:left; text-decoration:underline; text-underline-offset:3px; }
+.mobile-weekly .mw-feedback-dialog { padding:0; }
+.mobile-weekly .mw-feedback-detail { padding:16px; }
+.mobile-weekly .mw-feedback-item { padding:12px 0; border-top:1px solid #eef5f4; }
+.mobile-weekly .mw-feedback-item .ws-prose { margin:4px 0; }
+.mobile-weekly .mw-feedback-detail>.primary-button { width:100%; margin-top:12px; }
+.mobile-weekly.logged-out .mobile-weekly-content { display:flex; align-items:center; }
+.mobile-weekly .login-card { width:100%; max-width:none; margin:0; padding:24px; }
+.mobile-weekly .crm-dialog { width:calc(100% - 24px); max-width:496px; max-height:85dvh; padding:16px; border-radius:12px; box-sizing:border-box; }
+.mobile-weekly .crm-modal-head h2 { font-size:20px; }
+.mobile-weekly .crm-form-grid { grid-template-columns:minmax(0,1fr); }
+.mobile-weekly .crm-dialog textarea { min-height:140px; font-size:16px; }
+.mobile-weekly .crm-modal-footer { position:sticky; bottom:0; padding-top:12px; background:white; }
